@@ -1,7 +1,7 @@
 {
-    "name": "Janus",
+    "name": "JRNCL",
     "version": "1.0.0",
-    "description": "Creating Out-of-the-box React stack from old works",
+    "description": "Pre-development stage + nucleus-born app for future, Journicle",
     "keywords": [],
     "main": "index.js",
     "homepage": "",
@@ -13,14 +13,8 @@
         "start": "webpack-dev-server --host localhost --port 8080 --progress"
     },
     "babel": {
-        "presets": [
-            "es2015",
-            "react",
-            "stage-3"
-        ],
-        "plugins": [
-            "react-hot-loader/babel"
-        ]
+        "presets": ["es2015", "react", "stage-3"],
+        "plugins": ["react-hot-loader/babel"]
     },
     "author": "JJ Rafael",
     "license": "MIT",
