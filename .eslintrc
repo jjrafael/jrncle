@@ -1,0 +1,35 @@
+{
+  "extends": [ "eslint:recommended", "fbjs" ],
+  "env": {
+    node: true,
+    browser: true,
+    es6: true
+  },
+  "parserOptions": {
+    ecmaVersion: 6,
+    ecmaFeatures: {
+      "jsx": true,
+      "classes": true,
+      "objectLiteralShorthandMethods": true,
+      "experimentalObjectRestSpread": true,
+      "arrowFunctions": true,
+      "modules": true
+    },
+    sourceType: "module"
+  },
+  "plugins": ["react"],
+  "rules": {
+    "semi": 0,
+    "max-len": ["error", {code: 120}],
+    "indent": 0,
+    "no-constant-condition": 0,
+    "no-extra-semi": 0,
+    "no-unused-vars": 2,
+    "no-undef": 2,
+    "react/jsx-uses-vars": 2,
+    "react/jsx-key": 2,
+    "react/jsx-no-duplicate-props": 2,
+    "react/jsx-no-undef": 2,
+    "react/jsx-uses-react": 2,
+  }
+}
