@@ -47,7 +47,6 @@
         "redux-form": "^6.6.3",
         "redux-saga": "^0.13.0",
         "reselect": "^3.0.1",
-        "sports-model": "git+ssh://git@git.betica.com:betica/atom_sports_model#2.2.10",
         "underscore": "^1.8.3"
     },
     "devDependencies": {
