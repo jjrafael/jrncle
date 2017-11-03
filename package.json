@@ -47,7 +47,6 @@
         "redux-form": "^6.6.3",
         "redux-saga": "^0.13.0",
         "reselect": "^3.0.1",
-        "sports-model": "git+ssh://git@git.betica.com:betica/atom_sports_model#2.2.10",
         "underscore": "^1.8.3"
     },
     "devDependencies": {
@@ -77,6 +76,7 @@
         "eslint-plugin-relay": "0.0.8",
         "extract-text-webpack-plugin": "^1.0.1",
         "file-loader": "^0.10.1",
+        "firebase": "^4.6.0",
         "ignore-styles": "^5.0.1",
         "image-webpack-loader": "^3.2.0",
         "jest": "^20.0.3",
