@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import { store } from './store.js'
 import { router } from './router.js'
 import prototypeHelpers from './prototypeHelpers.js'
-import './stylesheets/main.scss'
+import './styles/main.scss'
 
 // render the main component
 ReactDOM.render(<Provider store={store}>{router}</Provider>, document.getElementById('app'))
