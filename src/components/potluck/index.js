@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import firebase from '../../firebase.js'
@@ -19,28 +19,22 @@ const mapDispatchToProps = dispatch => {
   )
 }
 
-class Potluck extends React.Component {
-  constructor(props) {
-    super(props)
+class Potluck extends Component {
+  constructor() {
+    super()
     this.state = {
-      //internal states
       currentItem: '',
       username: '',
+      items: [],
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
   }
-
-  componentWillMount() {
-    //execute after the component loaded
-  }
-
   handleChange(e) {
     this.setState({
       [e.target.name]: e.target.value,
     })
   }
-
   handleSubmit(e) {
     e.preventDefault()
     const itemsRef = firebase.database().ref('items')
@@ -54,7 +48,27 @@ class Potluck extends React.Component {
       username: '',
     })
   }
-
+  componentDidMount() {
+    const itemsRef = firebase.database().ref('items')
+    itemsRef.on('value', snapshot => {
+      let items = snapshot.val()
+      let newState = []
+      for (let item in items) {
+        newState.push({
+          id: item,
+          title: items[item].title,
+          user: items[item].user,
+        })
+      }
+      this.setState({
+        items: newState,
+      })
+    })
+  }
+  removeItem(itemId) {
+    const itemRef = firebase.database().ref(`/items/${itemId}`)
+    itemRef.remove()
+  }
   render() {
     return (
       <div className="app">
@@ -85,7 +99,19 @@ class Potluck extends React.Component {
           </section>
           <section className="display-item">
             <div className="wrapper">
-              <ul />
+              <ul>
+                {this.state.items.map(item => {
+                  return (
+                    <li key={item.id}>
+                      <h3>{item.title}</h3>
+                      <p>
+                        brought by: {item.user}
+                        <button onClick={() => this.removeItem(item.id)}>Remove Item</button>
+                      </p>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </section>
         </div>
