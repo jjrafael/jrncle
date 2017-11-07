@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import firebase, { auth, provider } from '../../firebase.js'
+import { getItems } from './actions'
 
 const mapStateToProps = state => {
   return {
     //external props to include on this component
-    expi: state.nucleusReducer.expi,
+    potluckItems: state.potluckReducer.items,
   }
 }
 
@@ -14,6 +15,7 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
       //actions
+      getItems,
     },
     dispatch
   )
@@ -73,28 +75,32 @@ class Potluck extends Component {
       }
     })
 
-    const itemsRef = firebase.database().ref('items')
-    itemsRef.on('value', snapshot => {
-      let items = snapshot.val()
-      let newState = []
-      for (let item in items) {
-        newState.push({
-          id: item,
-          title: items[item].title,
-          user: items[item].user,
-        })
-      }
-      this.setState({
-        items: newState,
-      })
-    })
+    // const itemsRef = firebase.database().ref('items')
+    // itemsRef.on('value', snapshot => {
+    //   let items = snapshot.val()
+    //   let newState = []
+    //   for (let item in items) {
+    //     newState.push({
+    //       id: item,
+    //       title: items[item].title,
+    //       user: items[item].user,
+    //     })
+    //   }
+    //   this.setState({
+    //     items: newState,
+    //   })
+    // })
+    console.log('jj debug2A')
+    getItems()
   }
   removeItem(itemId) {
     const itemRef = firebase.database().ref(`/items/${itemId}`)
     itemRef.remove()
   }
   render() {
-    console.log('jj statetsss: ', this.state.items)
+    const { potluckItems } = this.props
+    // console.log('jj statetsss: ', this.state.items)
+    console.log('jj potluckItems: ', potluckItems)
     return (
       <div className="app">
         <header>
