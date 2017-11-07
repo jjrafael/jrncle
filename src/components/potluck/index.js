@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import firebase from '../../firebase.js'
+import firebase, { auth, provider } from '../../firebase.js'
 
 const mapStateToProps = state => {
   return {
@@ -26,13 +26,31 @@ class Potluck extends Component {
       currentItem: '',
       username: '',
       items: [],
+      user: null,
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.login = this.login.bind(this)
+    this.logout = this.logout.bind(this)
   }
   handleChange(e) {
     this.setState({
       [e.target.name]: e.target.value,
+    })
+  }
+  logout() {
+    auth.signOut().then(() => {
+      this.setState({
+        user: null,
+      })
+    })
+  }
+  login() {
+    auth.signInWithPopup(provider).then(result => {
+      const user = result.user
+      this.setState({
+        user,
+      })
     })
   }
   handleSubmit(e) {
@@ -40,7 +58,7 @@ class Potluck extends Component {
     const itemsRef = firebase.database().ref('items')
     const item = {
       title: this.state.currentItem,
-      user: this.state.username,
+      user: this.state.user.displayName || this.state.user.email,
     }
     itemsRef.push(item)
     this.setState({
@@ -49,6 +67,12 @@ class Potluck extends Component {
     })
   }
   componentDidMount() {
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        this.setState({ user })
+      }
+    })
+
     const itemsRef = firebase.database().ref('items')
     itemsRef.on('value', snapshot => {
       let items = snapshot.val()
@@ -70,51 +94,69 @@ class Potluck extends Component {
     itemRef.remove()
   }
   render() {
+    console.log('jj statetsss: ', this.state.items)
     return (
       <div className="app">
         <header>
           <div className="wrapper">
-            <h1>Fun Food Friends</h1>
+            <h1>Potluck</h1>
+            {this.state.user ? (
+              <button onClick={this.logout}>Log Out</button>
+            ) : (
+              <button onClick={this.login}>Log In</button>
+            )}
           </div>
         </header>
-        <div className="container">
-          <section className="add-item">
-            <form onSubmit={this.handleSubmit}>
-              <input
-                type="text"
-                name="username"
-                placeholder="What's your name?"
-                onChange={this.handleChange}
-                value={this.state.username}
-              />
-              <input
-                type="text"
-                name="currentItem"
-                placeholder="What are you bringing?"
-                onChange={this.handleChange}
-                value={this.state.currentItem}
-              />
-              <button>Add Item</button>
-            </form>
-          </section>
-          <section className="display-item">
-            <div className="wrapper">
-              <ul>
-                {this.state.items.map(item => {
-                  return (
-                    <li key={item.id}>
-                      <h3>{item.title}</h3>
-                      <p>
-                        brought by: {item.user}
-                        <button onClick={() => this.removeItem(item.id)}>Remove Item</button>
-                      </p>
-                    </li>
-                  )
-                })}
-              </ul>
+        {this.state.user ? (
+          <div className="container">
+            <section className="add-item">
+              <form onSubmit={this.handleSubmit}>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="What's your name?"
+                  onChange={this.handleChange}
+                  value={this.state.user.displayName || this.state.user.email}
+                  disabled={true}
+                />
+                <input
+                  type="text"
+                  name="currentItem"
+                  placeholder="What are you bringing?"
+                  onChange={this.handleChange}
+                  value={this.state.currentItem}
+                />
+                <button>Add Item</button>
+              </form>
+            </section>
+            <section className="display-item">
+              <div className="wrapper">
+                <ul>
+                  {this.state.items.map(item => {
+                    return (
+                      <li key={item.id}>
+                        <h3>{item.title}</h3>
+                        <p>
+                          brought by: {item.user}
+                          {item.user === this.state.user.displayName || item.user === this.state.user.email ? (
+                            <button onClick={() => this.removeItem(item.id)}>Remove Item</button>
+                          ) : null}
+                        </p>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            </section>
+            <div>
+              <div className="user-profile">
+                <img src={this.state.user.photoURL} />
+              </div>
             </div>
-          </section>
-        </div>
+          </div>
+        ) : (
+          <p>You must be logged in to see the potluck list and submit to it.</p>
+        )}
       </div>
     )
   }
