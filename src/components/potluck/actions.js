@@ -1,7 +1,6 @@
 import actionTypes from './constants'
 
 export function getItems() {
-	console.log('jj debug2B')
 	return {
 		type: actionTypes.GET_ITEMS,
 	}
@@ -14,7 +13,7 @@ export function addItem(params) {
 	}
 }
 
-export function removeItems(id) {
+export function removeItem(id) {
 	return {
 		type: actionTypes.REMOVE_ITEM,
 		id,

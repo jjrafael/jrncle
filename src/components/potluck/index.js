@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import firebase, { auth, provider } from '../../firebase.js'
-import { getItems } from './actions'
+import { auth, provider } from '../../firebase.js'
+import { getItems, addItem, removeItem } from './actions'
 
 const mapStateToProps = state => {
   return {
@@ -16,6 +16,8 @@ const mapDispatchToProps = dispatch => {
     {
       //actions
       getItems,
+      addItem,
+      removeItem,
     },
     dispatch
   )
@@ -35,11 +37,7 @@ class Potluck extends Component {
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
   }
-  handleChange(e) {
-    this.setState({
-      [e.target.name]: e.target.value,
-    })
-  }
+
   logout() {
     auth.signOut().then(() => {
       this.setState({
@@ -55,57 +53,46 @@ class Potluck extends Component {
       })
     })
   }
+
+  handleChange(e) {
+    this.setState({
+      [e.target.name]: e.target.value,
+    })
+  }
+
   handleSubmit(e) {
     e.preventDefault()
-    const itemsRef = firebase.database().ref('items')
     const item = {
       title: this.state.currentItem,
       user: this.state.user.displayName || this.state.user.email,
     }
-    itemsRef.push(item)
+    this.props.addItem(item)
     this.setState({
       currentItem: '',
       username: '',
     })
   }
+
   componentDidMount() {
     auth.onAuthStateChanged(user => {
       if (user) {
         this.setState({ user })
       }
     })
+    this.props.getItems()
+  }
 
-    // const itemsRef = firebase.database().ref('items')
-    // itemsRef.on('value', snapshot => {
-    //   let items = snapshot.val()
-    //   let newState = []
-    //   for (let item in items) {
-    //     newState.push({
-    //       id: item,
-    //       title: items[item].title,
-    //       user: items[item].user,
-    //     })
-    //   }
-    //   this.setState({
-    //     items: newState,
-    //   })
-    // })
-    console.log('jj debug2A')
-    getItems()
+  remove(id) {
+    this.props.removeItem(id)
   }
-  removeItem(itemId) {
-    const itemRef = firebase.database().ref(`/items/${itemId}`)
-    itemRef.remove()
-  }
+
   render() {
     const { potluckItems } = this.props
-    // console.log('jj statetsss: ', this.state.items)
-    console.log('jj potluckItems: ', potluckItems)
     return (
       <div className="app">
         <header>
           <div className="wrapper">
-            <h1>Potluck</h1>
+            <h1>Experiments</h1>
             {this.state.user ? (
               <button onClick={this.logout}>Log Out</button>
             ) : (
@@ -138,14 +125,14 @@ class Potluck extends Component {
             <section className="display-item">
               <div className="wrapper">
                 <ul>
-                  {this.state.items.map(item => {
+                  {potluckItems.map(item => {
                     return (
                       <li key={item.id}>
                         <h3>{item.title}</h3>
                         <p>
                           brought by: {item.user}
                           {item.user === this.state.user.displayName || item.user === this.state.user.email ? (
-                            <button onClick={() => this.removeItem(item.id)}>Remove Item</button>
+                            <button onClick={() => this.remove(item.id)}>Remove Item</button>
                           ) : null}
                         </p>
                       </li>

@@ -25,5 +25,5 @@
 // }
 
 export function getExpi() {
-  //return (response = require(`../data/expi.json`))
+	//return (response = require(`../data/expi.json`))
 }
