@@ -8,6 +8,7 @@ const mapStateToProps = state => {
   return {
     //external props to include on this component
     potluckItems: state.potluckReducer.items,
+    user: state.authReducer.user,
   }
 }
 
@@ -28,30 +29,11 @@ class Potluck extends Component {
     super()
     this.state = {
       currentItem: '',
-      username: '',
+      userName: '',
       items: [],
-      user: null,
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
-    this.login = this.login.bind(this)
-    this.logout = this.logout.bind(this)
-  }
-
-  logout() {
-    auth.signOut().then(() => {
-      this.setState({
-        user: null,
-      })
-    })
-  }
-  login() {
-    auth.signInWithPopup(provider).then(result => {
-      const user = result.user
-      this.setState({
-        user,
-      })
-    })
   }
 
   handleChange(e) {
@@ -61,25 +43,23 @@ class Potluck extends Component {
   }
 
   handleSubmit(e) {
+    const { user } = this.props
     e.preventDefault()
     const item = {
       title: this.state.currentItem,
-      user: this.state.user.displayName || this.state.user.email,
+      user: user.displayName || user.email,
     }
     this.props.addItem(item)
     this.setState({
       currentItem: '',
-      username: '',
+      userName: '',
     })
   }
 
   componentDidMount() {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        this.setState({ user })
-      }
-    })
-    this.props.getItems()
+    if (this.state.user) {
+      this.props.getItems()
+    }
   }
 
   remove(id) {
@@ -87,29 +67,19 @@ class Potluck extends Component {
   }
 
   render() {
-    const { potluckItems } = this.props
+    const { potluckItems, user } = this.props
     return (
-      <div className="app">
-        <header>
-          <div className="wrapper">
-            <h1>Experiments</h1>
-            {this.state.user ? (
-              <button onClick={this.logout}>Log Out</button>
-            ) : (
-              <button onClick={this.login}>Log In</button>
-            )}
-          </div>
-        </header>
-        {this.state.user ? (
+      <div className="potluck-container">
+        {user ? (
           <div className="container">
             <section className="add-item">
               <form onSubmit={this.handleSubmit}>
                 <input
                   type="text"
-                  name="username"
+                  name="userName"
                   placeholder="What's your name?"
                   onChange={this.handleChange}
-                  value={this.state.user.displayName || this.state.user.email}
+                  value={user.displayName || user.email}
                   disabled={true}
                 />
                 <input
@@ -131,7 +101,7 @@ class Potluck extends Component {
                         <h3>{item.title}</h3>
                         <p>
                           brought by: {item.user}
-                          {item.user === this.state.user.displayName || item.user === this.state.user.email ? (
+                          {item.user === user.displayName || item.user === user.email ? (
                             <button onClick={() => this.remove(item.id)}>Remove Item</button>
                           ) : null}
                         </p>
@@ -141,11 +111,6 @@ class Potluck extends Component {
                 </ul>
               </div>
             </section>
-            <div>
-              <div className="user-profile">
-                <img src={this.state.user.photoURL} />
-              </div>
-            </div>
           </div>
         ) : (
           <p>You must be logged in to see the potluck list and submit to it.</p>
