@@ -34,6 +34,7 @@ class Potluck extends Component {
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this._addLocation = this._addLocation.bind(this)
   }
 
   handleChange(e) {
@@ -66,6 +67,10 @@ class Potluck extends Component {
     this.props.removeItem(id)
   }
 
+  _addLocation() {
+    console.log('jj _addLocation')
+  }
+
   render() {
     const { potluckItems, user } = this.props
     return (
@@ -85,11 +90,20 @@ class Potluck extends Component {
                 <input
                   type="text"
                   name="currentItem"
-                  placeholder="What are you bringing?"
+                  placeholder="Title"
                   onChange={this.handleChange}
                   value={this.state.currentItem}
                 />
-                <button>Add Item</button>
+                <input
+                  type="location"
+                  name="location"
+                  placeholder="Location"
+                  onChange={this.handleChange}
+                  value={this.state.currentItem}
+                  disabled={true}
+                />
+                <button onClick={this._addLocation}>Add Location</button>
+                <button onClick={this.handleSubmit}>Add Item</button>
               </form>
             </section>
             <section className="display-item">
